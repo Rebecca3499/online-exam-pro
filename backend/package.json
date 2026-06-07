@@ -1,0 +1,23 @@
+{
+  "name": "online-exam-pro-backend",
+  "version": "1.0.0",
+  "description": "REST API for Online Exam Pro",
+  "main": "src/app.js",
+  "engines": {
+    "node": ">=20 <23",
+    "npm": ">=10"
+  },
+  "scripts": {
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js",
+    "seed": "node src/seed.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
