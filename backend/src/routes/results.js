@@ -24,13 +24,28 @@ function normalizeResult(row) {
 router.post('/exam/submit', async (req, res, next) => {
   try {
     const { exam_id, answers = {}, duration_used = 0, switch_count = 0, is_timeout = false } = req.body;
-    const scored = await scoreSubmission(exam_id, answers);
+    const examId = Number(exam_id);
+    if (!examId) return res.status(400).json({ code: 400, message: '考试不能为空', data: null });
+
+    const existing = await get(
+      'SELECT id FROM submissions WHERE exam_id = ? AND user_id = ? ORDER BY submitted_at DESC LIMIT 1',
+      [examId, req.user.id]
+    );
+    if (existing) {
+      return res.status(409).json({
+        code: 409,
+        message: '你已提交过该考试，不能重复提交',
+        data: { id: existing.id, result_id: existing.id }
+      });
+    }
+
+    const scored = await scoreSubmission(examId, answers);
     const result = await run(
       `INSERT INTO submissions
       (exam_id, user_id, answers, score, total_score, correct_count, wrong_count, accuracy, duration_used, switch_count, is_timeout, detail)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        exam_id,
+        examId,
         req.user.id,
         JSON.stringify(answers),
         scored.score,

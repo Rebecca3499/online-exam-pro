@@ -19,5 +19,5 @@ export function removeStorage(key: string) {
 }
 
 export function examDraftKey(examId: number | string, userId: number | string) {
-  return `draft:${examId}:${userId}`
+  return `exam-state-${examId}-${userId}`
 }

@@ -1,7 +1,36 @@
+import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { formatSeconds } from './format'
 
-export function exportResultPdf(result: any) {
+export async function exportResultPdf(result: any, element?: HTMLElement | null) {
+  if (element) {
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true,
+      ignoreElements: (node) => node instanceof HTMLElement && node.classList.contains('pdf-ignore')
+    })
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
+    const imgWidth = pageWidth
+    const imgHeight = (canvas.height * imgWidth) / canvas.width
+    const imgData = canvas.toDataURL('image/png')
+    let position = 0
+    let remainingHeight = imgHeight
+
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+    remainingHeight -= pageHeight
+    while (remainingHeight > 0) {
+      position -= pageHeight
+      pdf.addPage()
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+      remainingHeight -= pageHeight
+    }
+    pdf.save(`exam-report-${result.id}.pdf`)
+    return
+  }
+
   const doc = new jsPDF()
   let y = 18
   doc.setFontSize(18)

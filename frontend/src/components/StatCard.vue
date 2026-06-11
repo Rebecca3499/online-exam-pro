@@ -6,10 +6,11 @@
     <div>
       <p>{{ label }}</p>
       <strong>{{ value }}</strong>
+      <small v-if="description">{{ description }}</small>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{ label: string; value: string | number; icon: string }>()
+defineProps<{ label: string; value: string | number; icon: string; description?: string }>()
 </script>

@@ -2,9 +2,23 @@
   <div class="login-page">
     <section class="login-visual">
       <div class="hero-copy">
-        <p>Online Exam Pro</p>
-        <h1>智测云</h1>
-        <span>从组卷、考试到成绩分析的一体化教学测评平台</span>
+        <p class="eyebrow">Online Exam Pro</p>
+        <h1>智测云 Online Exam Pro</h1>
+        <p class="subtitle">面向教学场景的在线考试与智能分析平台，覆盖组卷、答题、自动批改和成绩复盘。</p>
+        <div class="feature-list">
+          <div class="feature-pill">
+            <strong>自动批改</strong>
+            <span>提交后立即生成分数与错题解析</span>
+          </div>
+          <div class="feature-pill">
+            <strong>考试防切屏</strong>
+            <span>记录考试行为，辅助维护考试纪律</span>
+          </div>
+          <div class="feature-pill">
+            <strong>成绩可视化</strong>
+            <span>分布、趋势、高频错题一屏掌握</span>
+          </div>
+        </div>
       </div>
     </section>
     <el-card class="login-card">
@@ -20,8 +34,14 @@
         <el-button class="full" size="large" type="primary" :loading="loading" @click="handleLogin">登录系统</el-button>
       </el-form>
       <div class="account-tips">
-        <el-button text @click="fill('admin')">管理员：admin / 123456</el-button>
-        <el-button text @click="fill('student')">考生：student / 123456</el-button>
+        <div class="account-tip">
+          <span>管理员账号：admin / 123456</span>
+          <el-button text @click="fill('admin')">填入</el-button>
+        </div>
+        <div class="account-tip">
+          <span>考生账号：student / 123456</span>
+          <el-button text @click="fill('student')">填入</el-button>
+        </div>
       </div>
     </el-card>
   </div>

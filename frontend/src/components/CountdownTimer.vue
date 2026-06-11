@@ -9,26 +9,42 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { formatSeconds } from '@/utils/format'
 
-const props = defineProps<{ seconds: number; running?: boolean }>()
+const props = defineProps<{ seconds?: number; endAt?: number; running?: boolean }>()
 const emit = defineEmits<{ timeout: [] }>()
-const remain = ref(props.seconds)
+const remain = ref(0)
 let timer = 0
+let emitted = false
+
+function calcRemain() {
+  if (props.endAt) return Math.max(0, Math.floor((props.endAt - Date.now()) / 1000))
+  return Math.max(0, props.seconds || 0)
+}
+
+function updateRemain() {
+  if (props.endAt) remain.value = calcRemain()
+  else remain.value = Math.max(0, remain.value - 1)
+  if (remain.value <= 0 && !emitted) {
+    emitted = true
+    window.clearInterval(timer)
+    emit('timeout')
+  }
+}
 
 function start() {
   window.clearInterval(timer)
+  emitted = false
+  remain.value = calcRemain()
+  if (remain.value <= 0) {
+    updateRemain()
+    return
+  }
   timer = window.setInterval(() => {
     if (props.running === false) return
-    remain.value -= 1
-    if (remain.value <= 0) {
-      remain.value = 0
-      window.clearInterval(timer)
-      emit('timeout')
-    }
+    updateRemain()
   }, 1000)
 }
 
-watch(() => props.seconds, (value) => {
-  remain.value = value
+watch(() => [props.seconds, props.endAt], () => {
   start()
 })
 

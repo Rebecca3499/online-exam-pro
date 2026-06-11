@@ -24,13 +24,14 @@ request.interceptors.response.use(
   (error) => {
     const status = error.response?.status
     const message = error.response?.data?.message || error.message || '网络异常'
+    const handledByPage = status === 409 && message === '你已提交过该考试，不能重复提交'
     if (status === 401) {
       useAuthStore().logout()
       router.replace('/login')
     } else if (status === 403) {
       router.replace('/403')
     }
-    ElMessage.error(message)
+    if (!handledByPage) ElMessage.error(message)
     return Promise.reject(error)
   }
 )

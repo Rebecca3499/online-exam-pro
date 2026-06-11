@@ -1,21 +1,21 @@
 import request from './request'
 
 export function getQuestions(params?: any) {
-  return request.get('/questions', { params })
+  return request.get<any, any[]>('/questions', { params })
 }
 
 export function createQuestion(data: any) {
-  return request.post('/questions', data)
+  return request.post<any, any>('/questions', data)
 }
 
 export function updateQuestion(id: string | number, data: any) {
-  return request.put(`/questions/${id}`, data)
+  return request.put<any, any>(`/questions/${id}`, data)
 }
 
 export function deleteQuestion(id: string | number) {
-  return request.delete(`/questions/${id}`)
+  return request.delete<any, any>(`/questions/${id}`)
 }
 
 export function importQuestions(data: any[]) {
-  return request.post('/questions/import', { items: data })
+  return request.post<any, any>('/questions/import', { items: data })
 }

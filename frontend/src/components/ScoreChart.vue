@@ -1,10 +1,12 @@
 <template>
-  <div ref="chartRef" class="chart"></div>
+  <EmptyState v-if="!data.length" class="chart-empty" text="暂无图表数据" />
+  <div v-else ref="chartRef" class="chart"></div>
 </template>
 
 <script setup lang="ts">
 import * as echarts from 'echarts'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import EmptyState from '@/components/EmptyState.vue'
 
 const props = defineProps<{ title?: string; type?: 'bar' | 'line'; data: any[]; horizontal?: boolean }>()
 const chartRef = ref<HTMLDivElement>()
@@ -16,7 +18,7 @@ function render() {
   const names = props.data.map((item) => item.name)
   const values = props.data.map((item) => item.value)
   chart.setOption({
-    title: { text: props.title || '', left: 8, top: 4, textStyle: { fontSize: 14, color: '#1f2a44' } },
+    title: { text: props.title || '', left: 8, top: 4, textStyle: { fontSize: 14, color: '#132238', fontWeight: 700 } },
     tooltip: { trigger: 'axis' },
     grid: { left: props.horizontal ? 120 : 36, right: 24, top: 48, bottom: 34 },
     xAxis: props.horizontal ? { type: 'value' } : { type: 'category', data: names, axisLabel: { interval: 0 } },
@@ -26,19 +28,24 @@ function render() {
       data: values,
       smooth: true,
       barWidth: 24,
-      itemStyle: { borderRadius: props.horizontal ? [0, 6, 6, 0] : [6, 6, 0, 0], color: '#4f7cff' },
-      areaStyle: props.type === 'line' ? { color: 'rgba(79,124,255,.12)' } : undefined
+      itemStyle: { borderRadius: props.horizontal ? [0, 8, 8, 0] : [8, 8, 0, 0], color: '#4f7cff' },
+      lineStyle: props.type === 'line' ? { color: '#4f7cff', width: 3 } : undefined,
+      areaStyle: props.type === 'line' ? { color: 'rgba(79,124,255,.14)' } : undefined
     }]
   })
+}
+
+function resize() {
+  chart?.resize()
 }
 
 watch(() => props.data, () => nextTick(render), { deep: true })
 onMounted(() => {
   nextTick(render)
-  window.addEventListener('resize', render)
+  window.addEventListener('resize', resize)
 })
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', render)
+  window.removeEventListener('resize', resize)
   chart?.dispose()
 })
 </script>

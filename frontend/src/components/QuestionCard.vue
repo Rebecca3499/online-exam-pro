@@ -2,7 +2,7 @@
   <div class="question-card" :id="`question-${question.id}`">
     <div class="question-head">
       <div class="question-index">第 {{ index + 1 }} 题</div>
-      <el-tag :type="question.type === 'single' ? 'primary' : 'success'">{{ question.type === 'single' ? '单选题' : '判断题' }}</el-tag>
+      <el-tag :class="question.type === 'single' ? 'tag-single' : 'tag-judge'">{{ question.type === 'single' ? '单选题' : '判断题' }}</el-tag>
       <el-tag type="warning">{{ question.score }} 分</el-tag>
     </div>
     <h3>{{ question.title }}</h3>

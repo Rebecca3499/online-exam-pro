@@ -1,13 +1,11 @@
 <template>
-  <div>
-    <div class="page-title">
-      <div><h1>可参加考试</h1><p>选择考试后阅读须知并开始答题</p></div>
-    </div>
+  <div v-loading="loading" class="page-content">
+    <PageHeader title="选择并开始考试" subtitle="查看已发布考试，阅读规则后进入在线答题流程。" eyebrow="考生端" />
     <div v-if="!exams.length" class="panel"><EmptyState text="暂无已发布考试" /></div>
     <div class="exam-grid">
       <article v-for="exam in exams" :key="exam.id" class="exam-card">
         <div>
-          <el-tag type="primary">已发布</el-tag>
+          <el-tag class="tag-published">已发布</el-tag>
           <h2>{{ exam.title }}</h2>
           <p>{{ exam.description }}</p>
         </div>
@@ -24,11 +22,18 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import PageHeader from '@/components/PageHeader.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import { getExams } from '@/api/exams'
 
 const exams = ref<any[]>([])
+const loading = ref(false)
 onMounted(async () => {
-  exams.value = await getExams({ published: 1 }) as any[]
+  loading.value = true
+  try {
+    exams.value = await getExams({ published: 1 }) as any[]
+  } finally {
+    loading.value = false
+  }
 })
 </script>

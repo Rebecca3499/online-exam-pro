@@ -14,6 +14,27 @@ function normalizeExam(row) {
   };
 }
 
+function validateExamPayload(body) {
+  const title = String(body.title ?? '').trim();
+  const duration = Number(body.duration);
+  const totalScore = Number(body.total_score);
+
+  if (!title) return { message: '考试标题不能为空' };
+  if (!Number.isFinite(duration) || duration <= 0) return { message: '考试时长必须大于 0' };
+  if (!Number.isFinite(totalScore) || totalScore <= 0) return { message: '总分必须大于 0' };
+
+  return {
+    value: {
+      title,
+      description: String(body.description ?? '').trim(),
+      duration,
+      total_score: totalScore,
+      is_random: Boolean(body.is_random),
+      is_published: Boolean(body.is_published)
+    }
+  };
+}
+
 router.get('/exams', async (req, res, next) => {
   try {
     const where = req.user.role === 'student' || req.query.published === '1' ? 'WHERE e.is_published = 1' : '';
@@ -49,7 +70,9 @@ router.get('/exams/:id', async (req, res, next) => {
 
 router.post('/exams', adminRequired, async (req, res, next) => {
   try {
-    const { title, description, duration, total_score, is_random, is_published } = req.body;
+    const validated = validateExamPayload(req.body);
+    if (validated.message) return res.status(400).json({ code: 400, message: validated.message, data: null });
+    const { title, description, duration, total_score, is_random, is_published } = validated.value;
     const result = await run(
       'INSERT INTO exams (title, description, duration, total_score, is_random, is_published) VALUES (?, ?, ?, ?, ?, ?)',
       [title, description || '', duration, total_score, is_random ? 1 : 0, is_published ? 1 : 0]
@@ -62,7 +85,9 @@ router.post('/exams', adminRequired, async (req, res, next) => {
 
 router.put('/exams/:id', adminRequired, async (req, res, next) => {
   try {
-    const { title, description, duration, total_score, is_random, is_published } = req.body;
+    const validated = validateExamPayload(req.body);
+    if (validated.message) return res.status(400).json({ code: 400, message: validated.message, data: null });
+    const { title, description, duration, total_score, is_random, is_published } = validated.value;
     await run(
       'UPDATE exams SET title = ?, description = ?, duration = ?, total_score = ?, is_random = ?, is_published = ? WHERE id = ?',
       [title, description || '', duration, total_score, is_random ? 1 : 0, is_published ? 1 : 0, req.params.id]
